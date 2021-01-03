@@ -29,6 +29,7 @@ steps:
         gcloud run deploy ${REPO_NAME}-${BRANCH_NAME} \
           --image ${_DEFAULT_REGION}-docker.pkg.dev/${PROJECT_ID}/container-repository/${REPO_NAME}:dev-${SHORT_SHA} \
           --region ${_DEFAULT_REGION} \
+          --port 8080 \
           --platform managed \
           --allow-unauthenticated \
           --vpc-connector ${_CONNECTOR_NAME} \
