@@ -1,0 +1,50 @@
+#
+# Requires that you already have a version running in production. Based on the
+# _TRAFFIC_PERCENTAGE value defined in our build trigger, we will perform a
+# canary release to that percentage of traffic to the service.
+#
+
+steps:
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: /bin/sh
+    args:
+      - "-c"
+      - |
+        set -ex
+        gcloud container images add-tag \
+          ${_DEFAULT_REGION}-docker.pkg.dev/${_SEED_PROJECT_ID}/container-repository/${REPO_NAME}:stage-${SHORT_SHA} \
+          ${_DEFAULT_REGION}-docker.pkg.dev/${_SEED_PROJECT_ID}/container-repository/${REPO_NAME}:${TAG_NAME} \
+
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: /bin/sh
+    args:
+      - "-c"
+      - |
+        set -ex
+        gcloud --project ${_PRD_PROJECT_ID} \
+          run deploy ${REPO_NAME} \
+          --image ${_DEFAULT_REGION}-docker.pkg.dev/${_SEED_PROJECT_ID}/container-repository/${REPO_NAME}:${TAG_NAME} \
+          --region ${_DEFAULT_REGION} \
+          --platform managed \
+          --no-traffic \
+          --allow-unauthenticated
+
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: /bin/sh
+    args:
+      - "-c"
+      - |
+        set -ex
+        gcloud --project ${_PRD_PROJECT_ID} \
+          run services update-traffic ${REPO_NAME} \
+          --region ${_DEFAULT_REGION} \
+          --platform managed \
+          --to-revisions LATEST=${_TRAFFIC_PERCENTAGE} \
+          --vpc-connector ${_CONNECTOR_NAME}
+
+# https://cloud.google.com/cloud-build/docs/configuring-builds/substitute-variable-values
+substitutions:
+  _POLICY_REPO: '' # add path to policies here https://github.com/forseti-security/policy-library/blob/master/docs/user_guide.md#how-to-use-terraform-validator
+
+# Cloud Build Timeout
+timeout: 3600s

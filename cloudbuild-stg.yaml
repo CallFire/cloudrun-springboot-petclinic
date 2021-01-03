@@ -1,0 +1,37 @@
+#
+# This workflow will perform the final docker build and will be the build asset
+# we use to promote to production. Here we can perform final docker scans for
+# security precautions and serves as our final gatekeeper.
+#
+
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: /bin/bash
+    args:
+      - "-c"
+      - |
+        set -ex
+        docker build -t "${_DEFAULT_REGION}-docker.pkg.dev/${_SEED_PROJECT_ID}/container-repository/${REPO_NAME}:stage-${SHORT_SHA}" .
+        docker push "${_DEFAULT_REGION}-docker.pkg.dev/${_SEED_PROJECT_ID}/container-repository/${REPO_NAME}:stage-${SHORT_SHA}"
+
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: /bin/sh
+    args:
+      - "-c"
+      - |
+        set -ex
+        gcloud --project ${_STG_PROJECT_ID} \
+          run deploy stage-${REPO_NAME} \
+          --image ${_DEFAULT_REGION}-docker.pkg.dev/${_SEED_PROJECT_ID}/container-repository/${REPO_NAME}:stage-${SHORT_SHA} \
+          --region ${_DEFAULT_REGION} \
+          --platform managed \
+          --allow-unauthenticated \
+          --vpc-connector ${_CONNECTOR_NAME} \
+          #--set-env-vars CONNECTION_TYPE=ip \
+
+# https://cloud.google.com/cloud-build/docs/configuring-builds/substitute-variable-values
+substitutions:
+  _POLICY_REPO: '' # add path to policies here https://github.com/forseti-security/policy-library/blob/master/docs/user_guide.md#how-to-use-terraform-validator
+
+# Cloud Build Timeout
+timeout: 3600s
