@@ -1,0 +1,36 @@
+#
+# Deploys our tagged release with 100% traffic if canary release went well.
+#
+
+steps:
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: /bin/sh
+    args:
+      - "-c"
+      - |
+        set -ex
+        gcloud container images add-tag \
+          ${_DEFAULT_REGION}-docker.pkg.dev/${_SEED_PROJECT_ID}/container-repository/${REPO_NAME}:stage-${SHORT_SHA} \
+          ${_DEFAULT_REGION}-docker.pkg.dev/${_SEED_PROJECT_ID}/container-repository/${REPO_NAME}:${TAG_NAME} \
+
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: /bin/sh
+    args:
+      - "-c"
+      - |
+        set -ex
+        gcloud --project ${_PRD_PROJECT_ID} \
+          run deploy ${REPO_NAME} \
+          --image ${_DEFAULT_REGION}-docker.pkg.dev/${_SEED_PROJECT_ID}/container-repository/${REPO_NAME}:${TAG_NAME} \
+          --region ${_DEFAULT_REGION} \
+          --platform managed \
+          --allow-unauthenticated \
+          --vpc-connector ${_CONNECTOR_NAME} \
+          # --image ${_DEFAULT_REGION}-docker.pkg.dev/${_SEED_PROJECT_ID}/container-repository/${REPO_NAME}:${TAG_NAME} \
+
+# https://cloud.google.com/cloud-build/docs/configuring-builds/substitute-variable-values
+substitutions:
+  _POLICY_REPO: '' # add path to policies here https://github.com/forseti-security/policy-library/blob/master/docs/user_guide.md#how-to-use-terraform-validator
+
+# Cloud Build Timeout
+timeout: 3600s

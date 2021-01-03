@@ -1,0 +1,54 @@
+#
+# Use artifact registry over container registry so we can keep it private and
+# shared across projects/environments. Container registry only allows private
+# single project use in the form similar to
+# gcr.io/${PROJECT_ID}/${REPO_NAME}:dev-${SHORT_SHA}
+#
+# References
+# * https://cloud.google.com/run/docs/how-to
+# * https://codelabs.developers.google.com/codelabs/cloud-spring-petclinic-cloudsql
+# * https://cloud.google.com/sql/docs/mysql/connect-run#private-ip
+
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: /bin/bash
+    args:
+      - "-c"
+      - |
+        set -ex
+        docker build -t "${_DEFAULT_REGION}-docker.pkg.dev/${PROJECT_ID}/container-repository/${REPO_NAME}:dev-${SHORT_SHA}" .
+        docker push "${_DEFAULT_REGION}-docker.pkg.dev/${PROJECT_ID}/container-repository/${REPO_NAME}:dev-${SHORT_SHA}"
+
+  # https://cloud.google.com/run/docs/configuring/environment-variables
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: /bin/sh
+    args:
+      - "-c"
+      - |
+        set -ex
+        gcloud run deploy ${REPO_NAME}-${BRANCH_NAME} \
+          --image ${_DEFAULT_REGION}-docker.pkg.dev/${PROJECT_ID}/container-repository/${REPO_NAME}:dev-${SHORT_SHA} \
+          --region ${_DEFAULT_REGION} \
+          --platform managed \
+          --allow-unauthenticated \
+          --vpc-connector ${_CONNECTOR_NAME} \
+          --update-env-vars CLOUD_SQL_CONNECTION_NAME=${_CLOUD_MYSQL} \
+          --update-env-vars DB_USER=app \
+          --update-env-vars DB_PASS=PaSsWoRd \
+          --update-env-vars DB_NAME=petclinic \
+          #--vpc-egress # all|private-ranges-only(default) \
+          #--set-env-vars CONNECTION_TYPE=ip \
+
+# We already pushed the image in the first step as we need it to use it in the following deploy step
+# images:
+#   - "${_DEFAULT_REGION}-docker.pkg.dev/${PROJECT_ID}/container-repository/${REPO_NAME}:dev-${SHORT_SHA}"
+
+# Variables defined here will not override the ones supplied by our build
+# trigger. These variables are considered defaults if the value from our
+# build trigger is empty or does not exist.
+# https://cloud.google.com/cloud-build/docs/configuring-builds/substitute-variable-values
+substitutions:
+  _POLICY_REPO: '' # add path to policies here https://github.com/forseti-security/policy-library/blob/master/docs/user_guide.md#how-to-use-terraform-validator
+
+# Cloud Build Timeout
+timeout: 3600s
