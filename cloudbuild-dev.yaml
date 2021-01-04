@@ -5,9 +5,20 @@
 # gcr.io/${PROJECT_ID}/${REPO_NAME}:dev-${SHORT_SHA}
 #
 # References
-# * https://cloud.google.com/run/docs/how-to
-# * https://codelabs.developers.google.com/codelabs/cloud-spring-petclinic-cloudsql
-# * https://cloud.google.com/sql/docs/mysql/connect-run#private-ip
+# [general]
+#   * https://cloud.google.com/run/docs/how-to
+#   * https://codelabs.developers.google.com/codelabs/cloud-spring-petclinic-cloudsql
+# [cloud-sql]
+#   * https://cloud.google.com/sql/docs/mysql/instance-access-control
+#   * https://cloud.google.com/sql/docs/mysql/connect-run#private-ip
+#   * https://cloud.google.com/sql/docs/mysql/connect-run#java_1
+# [service-account]
+#   * https://cloud.google.com/run/docs/configuring/service-accounts
+# [local]
+#   * https://cloud.google.com/sql/docs/mysql/quickstart-proxy-test
+# [tips]
+#   * https://cloud.google.com/run/docs/tips/general
+#   * https://cloud.google.com/run/docs/tips/java
 
 steps:
   - name: "gcr.io/cloud-builders/docker"
@@ -32,12 +43,14 @@ steps:
           --platform managed \
           --allow-unauthenticated \
           --vpc-connector ${_CONNECTOR_NAME} \
-          --update-env-vars CLOUD_SQL_CONNECTION_NAME=${_CLOUD_MYSQL} \
-          --update-env-vars DB_USER=app \
-          --update-env-vars DB_PASS=PaSsWoRd \
-          --update-env-vars DB_NAME=petclinic \
-          #--vpc-egress # all|private-ranges-only(default) \
-          #--set-env-vars CONNECTION_TYPE=ip \
+          --set-cloudsql-instances ${_CLOUD_MYSQL} \
+          # --update-env-vars CLOUD_SQL_CONNECTION_NAME=${_CLOUD_MYSQL} \
+          # --update-env-vars DB_USER=app \
+          # --update-env-vars DB_PASS=PaSsWoRd \
+          # --update-env-vars DB_NAME=petclinic \
+          # --set-env-vars CONNECTION_TYPE=ip \
+          # --vpc-egress # all|private-ranges-only(default) \
+          # --port 8080 \
 
 # We already pushed the image in the first step as we need it to use it in the following deploy step
 # images:
