@@ -42,6 +42,7 @@ steps:
           --region ${_DEFAULT_REGION} \
           --platform managed \
           --allow-unauthenticated \
+          --memory 512Mi \
           --vpc-connector ${_CONNECTOR_NAME} \
           --set-cloudsql-instances ${_CLOUD_MYSQL} \
           # --update-env-vars CLOUD_SQL_CONNECTION_NAME=${_CLOUD_MYSQL} \
@@ -52,6 +53,9 @@ steps:
           # --vpc-egress # all|private-ranges-only(default) \
           # --port 8080 \
 
+# project-service-account@prj-sre-d-sandbox-run-c366.iam.gserviceaccount.com
+# p195303305359-xdldiw@gcp-sa-cloud-sql.iam.gserviceaccount.com
+#
 # We already pushed the image in the first step as we need it to use it in the following deploy step
 # images:
 #   - "${_DEFAULT_REGION}-docker.pkg.dev/${PROJECT_ID}/container-repository/${REPO_NAME}:dev-${SHORT_SHA}"
