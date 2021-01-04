@@ -39,6 +39,7 @@ steps:
           --region ${_DEFAULT_REGION} \
           --platform managed \
           --allow-unauthenticated \
+          --memory 512Mi \
           --vpc-connector ${_CONNECTOR_NAME} \
           --set-cloudsql-instances ${_CLOUD_MYSQL} \
           # --update-env-vars CLOUD_SQL_CONNECTION_NAME=${_CLOUD_MYSQL} \
