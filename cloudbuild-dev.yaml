@@ -5,9 +5,17 @@
 # gcr.io/${PROJECT_ID}/${REPO_NAME}:dev-${SHORT_SHA}
 #
 # References
-# * https://cloud.google.com/run/docs/how-to
-# * https://codelabs.developers.google.com/codelabs/cloud-spring-petclinic-cloudsql
-# * https://cloud.google.com/sql/docs/mysql/connect-run#private-ip
+# [general]
+#   * https://cloud.google.com/run/docs/how-to
+#   * https://codelabs.developers.google.com/codelabs/cloud-spring-petclinic-cloudsql
+# [cloud-sql]
+#   * https://cloud.google.com/sql/docs/mysql/instance-access-control
+#   * https://cloud.google.com/sql/docs/mysql/connect-run#private-ip
+#   * https://cloud.google.com/sql/docs/mysql/connect-run#java_1
+# [service-account]
+#   * https://cloud.google.com/run/docs/configuring/service-accounts
+# [local]
+#   * https://cloud.google.com/sql/docs/mysql/quickstart-proxy-test
 
 steps:
   - name: "gcr.io/cloud-builders/docker"
@@ -31,14 +39,20 @@ steps:
           --region ${_DEFAULT_REGION} \
           --platform managed \
           --allow-unauthenticated \
+          --memory 512Mi \
           --vpc-connector ${_CONNECTOR_NAME} \
-          --update-env-vars CLOUD_SQL_CONNECTION_NAME=${_CLOUD_MYSQL} \
-          --update-env-vars DB_USER=app \
-          --update-env-vars DB_PASS=PaSsWoRd \
-          --update-env-vars DB_NAME=petclinic \
+          --set-cloudsql-instances ${_CLOUD_MYSQL} \
+          # --update-env-vars CLOUD_SQL_CONNECTION_NAME=${_CLOUD_MYSQL} \
+          # --update-env-vars DB_USER=app \
+          # --update-env-vars DB_PASS=PaSsWoRd \
+          # --update-env-vars DB_NAME=petclinic \
           #--vpc-egress # all|private-ranges-only(default) \
           #--set-env-vars CONNECTION_TYPE=ip \
+          # --port 8080 \
 
+# project-service-account@prj-sre-d-sandbox-run-c366.iam.gserviceaccount.com
+# p195303305359-xdldiw@gcp-sa-cloud-sql.iam.gserviceaccount.com
+#
 # We already pushed the image in the first step as we need it to use it in the following deploy step
 # images:
 #   - "${_DEFAULT_REGION}-docker.pkg.dev/${PROJECT_ID}/container-repository/${REPO_NAME}:dev-${SHORT_SHA}"

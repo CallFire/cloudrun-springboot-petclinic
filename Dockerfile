@@ -19,7 +19,7 @@ RUN mvn package -DskipTests
 FROM adoptopenjdk/openjdk8:alpine-slim
 
 # Copy the jar to the production image from the builder stage.
-COPY --from=build-env /app/target/petclinic-*.jar /petclinic.jar
+COPY --from=build-env /app/target/spring-petclinic-*.jar /petclinic.jar
 
 # Run the web service on container startup.
 CMD ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/petclinic.jar"]
