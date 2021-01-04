@@ -6,12 +6,16 @@
 #
 # References
 # [general]
-# * https://cloud.google.com/run/docs/how-to
-# * https://codelabs.developers.google.com/codelabs/cloud-spring-petclinic-cloudsql
-# * https://cloud.google.com/sql/docs/mysql/connect-run#private-ip
-# * https://cloud.google.com/run/docs/configuring/service-accounts
+#   * https://cloud.google.com/run/docs/how-to
+#   * https://codelabs.developers.google.com/codelabs/cloud-spring-petclinic-cloudsql
+# [cloud-sql]
+#   * https://cloud.google.com/sql/docs/mysql/instance-access-control
+#   * https://cloud.google.com/sql/docs/mysql/connect-run#private-ip
+#   * https://cloud.google.com/sql/docs/mysql/connect-run#java_1
+# [service-account]
+#   * https://cloud.google.com/run/docs/configuring/service-accounts
 # [local]
-# * https://cloud.google.com/sql/docs/mysql/quickstart-proxy-test
+#   * https://cloud.google.com/sql/docs/mysql/quickstart-proxy-test
 
 steps:
   - name: "gcr.io/cloud-builders/docker"
@@ -33,10 +37,10 @@ steps:
         gcloud run deploy ${REPO_NAME}-${BRANCH_NAME} \
           --image ${_DEFAULT_REGION}-docker.pkg.dev/${PROJECT_ID}/container-repository/${REPO_NAME}:dev-${SHORT_SHA} \
           --region ${_DEFAULT_REGION} \
-          --service-account p195303305359-xdldiw@gcp-sa-cloud-sql.iam.gserviceaccount.com \
           --platform managed \
           --allow-unauthenticated \
           --vpc-connector ${_CONNECTOR_NAME} \
+          --set-cloudsql-instances ${_CLOUD_MYSQL} \
           --update-env-vars CLOUD_SQL_CONNECTION_NAME=${_CLOUD_MYSQL} \
           --update-env-vars DB_USER=app \
           --update-env-vars DB_PASS=PaSsWoRd \
