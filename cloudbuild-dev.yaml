@@ -41,10 +41,10 @@ steps:
           --allow-unauthenticated \
           --vpc-connector ${_CONNECTOR_NAME} \
           --set-cloudsql-instances ${_CLOUD_MYSQL} \
-          --update-env-vars CLOUD_SQL_CONNECTION_NAME=${_CLOUD_MYSQL} \
-          --update-env-vars DB_USER=app \
-          --update-env-vars DB_PASS=PaSsWoRd \
-          --update-env-vars DB_NAME=petclinic \
+          # --update-env-vars CLOUD_SQL_CONNECTION_NAME=${_CLOUD_MYSQL} \
+          # --update-env-vars DB_USER=app \
+          # --update-env-vars DB_PASS=PaSsWoRd \
+          # --update-env-vars DB_NAME=petclinic \
           #--vpc-egress # all|private-ranges-only(default) \
           #--set-env-vars CONNECTION_TYPE=ip \
           # --port 8080 \
