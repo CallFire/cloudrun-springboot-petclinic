@@ -25,10 +25,15 @@ steps:
           --image ${_DEFAULT_REGION}-docker.pkg.dev/${_SEED_PROJECT_ID}/container-repository/${REPO_NAME}:stage-${SHORT_SHA} \
           --region ${_DEFAULT_REGION} \
           --platform managed \
+          --service-account project-service-account@${_STG_PROJECT_ID}.iam.gserviceaccount.com \
           --allow-unauthenticated \
           --memory 512Mi \
           --vpc-connector ${_CONNECTOR_NAME} \
           --set-cloudsql-instances ${_CLOUD_MYSQL} \
+          --update-env-vars MYSQL_CONN=${_CLOUD_MYSQL} \
+          --update-env-vars MYSQL_DB=petclinic \
+          --update-env-vars MYSQL_USER=app \
+          --update-env-vars MYSQL_PASS=PaSsWoRd \
 
 # https://cloud.google.com/cloud-build/docs/configuring-builds/substitute-variable-values
 substitutions:
