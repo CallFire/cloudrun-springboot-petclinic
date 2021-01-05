@@ -26,8 +26,9 @@ steps:
           --region ${_DEFAULT_REGION} \
           --platform managed \
           --allow-unauthenticated \
+          --memory 512Mi \
           --vpc-connector ${_CONNECTOR_NAME} \
-          #--set-env-vars CONNECTION_TYPE=ip \
+          --set-cloudsql-instances ${_CLOUD_MYSQL} \
 
 # https://cloud.google.com/cloud-build/docs/configuring-builds/substitute-variable-values
 substitutions:

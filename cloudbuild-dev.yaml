@@ -16,6 +16,9 @@
 #   * https://cloud.google.com/run/docs/configuring/service-accounts
 # [local]
 #   * https://cloud.google.com/sql/docs/mysql/quickstart-proxy-test
+# [tips]
+#   * https://cloud.google.com/run/docs/tips/general
+#   * https://cloud.google.com/run/docs/tips/java
 
 steps:
   - name: "gcr.io/cloud-builders/docker"
@@ -46,8 +49,8 @@ steps:
           # --update-env-vars DB_USER=app \
           # --update-env-vars DB_PASS=PaSsWoRd \
           # --update-env-vars DB_NAME=petclinic \
-          #--vpc-egress # all|private-ranges-only(default) \
-          #--set-env-vars CONNECTION_TYPE=ip \
+          # --set-env-vars CONNECTION_TYPE=ip \
+          # --vpc-egress # all|private-ranges-only(default) \
           # --port 8080 \
 
 # project-service-account@prj-sre-d-sandbox-run-c366.iam.gserviceaccount.com
