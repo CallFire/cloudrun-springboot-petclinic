@@ -26,6 +26,7 @@ steps:
           --image ${_DEFAULT_REGION}-docker.pkg.dev/${_SEED_PROJECT_ID}/container-repository/${REPO_NAME}:${TAG_NAME} \
           --region ${_DEFAULT_REGION} \
           --platform managed \
+          --service-acount project-service-account@${_PRD_PROJECT_ID}.iam.gserviceaccount.com \
           --no-traffic \
           --allow-unauthenticated
 
@@ -39,6 +40,7 @@ steps:
           run services update-traffic ${REPO_NAME} \
           --region ${_DEFAULT_REGION} \
           --platform managed \
+          --service-acount project-service-account@${_PRD_PROJECT_ID}.iam.gserviceaccount.com \
           --to-revisions LATEST=${_TRAFFIC_PERCENTAGE} \
           --memory 512Mi \
           --vpc-connector ${_CONNECTOR_NAME} \
