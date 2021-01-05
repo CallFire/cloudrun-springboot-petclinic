@@ -29,6 +29,10 @@ steps:
           --memory 512Mi \
           --vpc-connector ${_CONNECTOR_NAME} \
           --set-cloudsql-instances ${_CLOUD_MYSQL} \
+          --update-env-vars MYSQL_CONN=${_CLOUD_MYSQL} \
+          --update-env-vars MYSQL_DB=petclinic \
+          --update-env-vars MYSQL_USER=app \
+          --update-env-vars MYSQL_PASS=PaSsWoRd \
 
 # https://cloud.google.com/cloud-build/docs/configuring-builds/substitute-variable-values
 substitutions:
