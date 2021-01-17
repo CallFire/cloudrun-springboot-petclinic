@@ -11,8 +11,8 @@ steps:
       - "-c"
       - |
         set -ex
-        docker build -t "${_DEFAULT_REGION}-docker.pkg.dev/${_SEED_PROJECT_ID}/container-repository/${REPO_NAME}:stage-${SHORT_SHA}" .
-        docker push "${_DEFAULT_REGION}-docker.pkg.dev/${_SEED_PROJECT_ID}/container-repository/${REPO_NAME}:stage-${SHORT_SHA}"
+        docker build -t "${_ARTIFACT_REGISTRY}/${REPO_NAME}:stage-${SHORT_SHA}" .
+        docker push "${_ARTIFACT_REGISTRY}/${REPO_NAME}:stage-${SHORT_SHA}"
 
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     entrypoint: /bin/sh
@@ -22,7 +22,7 @@ steps:
         set -ex
         gcloud --project ${_STG_PROJECT_ID} \
           run deploy stage-${REPO_NAME} \
-          --image ${_DEFAULT_REGION}-docker.pkg.dev/${_SEED_PROJECT_ID}/container-repository/${REPO_NAME}:stage-${SHORT_SHA} \
+          --image ${_ARTIFACT_REGISTRY}/${REPO_NAME}:stage-${SHORT_SHA} \
           --region ${_DEFAULT_REGION} \
           --platform managed \
           --service-account project-service-account@${_STG_PROJECT_ID}.iam.gserviceaccount.com \

@@ -27,8 +27,8 @@ steps:
       - "-c"
       - |
         set -ex
-        docker build -t "${_DEFAULT_REGION}-docker.pkg.dev/${PROJECT_ID}/container-repository/${REPO_NAME}:dev-${SHORT_SHA}" .
-        docker push "${_DEFAULT_REGION}-docker.pkg.dev/${PROJECT_ID}/container-repository/${REPO_NAME}:dev-${SHORT_SHA}"
+        docker build -t "${_ARTIFACT_REGISTRY}/${REPO_NAME}:dev-${SHORT_SHA}" .
+        docker push "${_ARTIFACT_REGISTRY}/${REPO_NAME}:dev-${SHORT_SHA}"
 
   # https://cloud.google.com/run/docs/configuring/environment-variables
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
@@ -38,7 +38,7 @@ steps:
       - |
         set -ex
         gcloud run deploy ${REPO_NAME}-${BRANCH_NAME} \
-          --image ${_DEFAULT_REGION}-docker.pkg.dev/${PROJECT_ID}/container-repository/${REPO_NAME}:dev-${SHORT_SHA} \
+          --image ${_ARTIFACT_REGISTRY}/${REPO_NAME}:dev-${SHORT_SHA} \
           --region ${_DEFAULT_REGION} \
           --platform managed \
           --service-account project-service-account@${PROJECT_ID}.iam.gserviceaccount.com \
