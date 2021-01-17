@@ -49,7 +49,7 @@ steps:
           --update-env-vars MYSQL_CONN=${_CLOUD_MYSQL} \
           --update-env-vars MYSQL_DB=petclinic \
           --update-env-vars MYSQL_USER=app \
-          #--update-env-vars MYSQL_PASS=PaSsWoRd \
+          --update-env-vars MYSQL_PASS=PaSsWoRd \
           # --vpc-egress # all|private-ranges-only(default) \
           # --port 8080 \
 
