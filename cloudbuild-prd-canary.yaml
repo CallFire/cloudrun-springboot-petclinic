@@ -12,8 +12,8 @@ steps:
       - |
         set -ex
         gcloud container images add-tag \
-          ${_DEFAULT_REGION}-docker.pkg.dev/${_SEED_PROJECT_ID}/container-repository/${REPO_NAME}:stage-${SHORT_SHA} \
-          ${_DEFAULT_REGION}-docker.pkg.dev/${_SEED_PROJECT_ID}/container-repository/${REPO_NAME}:${TAG_NAME} \
+          ${_ARTIFACT_REGISTRY}/${REPO_NAME}:stage-${SHORT_SHA} \
+          ${_ARTIFACT_REGISTRY}/${REPO_NAME}:${TAG_NAME} \
 
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     entrypoint: /bin/sh
@@ -23,7 +23,7 @@ steps:
         set -ex
         gcloud --project ${_PRD_PROJECT_ID} \
           run deploy ${REPO_NAME} \
-          --image ${_DEFAULT_REGION}-docker.pkg.dev/${_SEED_PROJECT_ID}/container-repository/${REPO_NAME}:${TAG_NAME} \
+          --image ${_ARTIFACT_REGISTRY}/${REPO_NAME}:${TAG_NAME} \
           --region ${_DEFAULT_REGION} \
           --platform managed \
           --service-account project-service-account@${_PRD_PROJECT_ID}.iam.gserviceaccount.com \
