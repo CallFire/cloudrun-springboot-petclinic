@@ -7,6 +7,7 @@
 # References
 # [general]
 #   * https://cloud.google.com/run/docs/how-to
+#   * https://cloud.google.com/run/docs/configuring/environment-variables
 #   * https://codelabs.developers.google.com/codelabs/cloud-spring-petclinic-cloudsql
 # [cloud-sql]
 #   * https://cloud.google.com/sql/docs/mysql/instance-access-control
@@ -21,6 +22,7 @@
 #   * https://cloud.google.com/run/docs/tips/java
 
 steps:
+  # [Start docker build]
   - name: "gcr.io/cloud-builders/docker"
     entrypoint: /bin/bash
     args:
@@ -29,8 +31,7 @@ steps:
         set -ex
         docker build -t "${_ARTIFACT_REGISTRY}/${REPO_NAME}:dev-${SHORT_SHA}" .
         docker push "${_ARTIFACT_REGISTRY}/${REPO_NAME}:dev-${SHORT_SHA}"
-
-  # https://cloud.google.com/run/docs/configuring/environment-variables
+  # [Start secrets]
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     entrypoint: /bin/sh
     args:
@@ -41,6 +42,17 @@ steps:
           --project=${_SEC_PROJECT_ID} \
           --secret=cr-sqldb-petclinic-app-secret \
           --format='get(payload.data)' | tr '_-' '/+' | base64 -d > decrypted-data.txt
+  # [Start run deployment]
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: /bin/sh
+    args:
+      - "-c"
+      - |
+        set -ex
+        # gcloud secrets versions access latest \
+        #   --project=${_SEC_PROJECT_ID} \
+        #   --secret=cr-sqldb-petclinic-app-secret \
+        #   --format='get(payload.data)' | tr '_-' '/+' | base64 -d > decrypted-data.txt
         gcloud run deploy ${REPO_NAME}-${BRANCH_NAME} \
           --image ${_ARTIFACT_REGISTRY}/${REPO_NAME}:dev-${SHORT_SHA} \
           --region ${_DEFAULT_REGION} \
