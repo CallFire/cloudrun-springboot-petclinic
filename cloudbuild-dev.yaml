@@ -38,6 +38,7 @@ steps:
       - |
         set -ex
         gcloud secrets versions access latest \
+          --project=${_SEC_PROJECT_ID} \
           --secret=cr-sqldb-petclinic-app-secret \
           --format='get(payload.data)' | tr '_-' '/+' | base64 -d > decrypted-data.txt
         _MYSQL_PASS=$(cat decrypted-data.txt)
@@ -70,6 +71,10 @@ steps:
 # https://cloud.google.com/cloud-build/docs/configuring-builds/substitute-variable-values
 substitutions:
   _POLICY_REPO: '' # add path to policies here https://github.com/forseti-security/policy-library/blob/master/docs/user_guide.md#how-to-use-terraform-validator
+
+# Build options
+options:
+  machineType: 'N1_HIGHCPU_8'
 
 # Cloud Build Timeout
 timeout: 3600s
