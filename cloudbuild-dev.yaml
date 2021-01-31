@@ -8,6 +8,7 @@
 # [general]
 #   * https://cloud.google.com/run/docs/how-to
 #   * https://cloud.google.com/run/docs/configuring/environment-variables
+# [springboot]
 #   * https://codelabs.developers.google.com/codelabs/cloud-spring-petclinic-cloudsql
 # [cloud-sql]
 #   * https://cloud.google.com/sql/docs/mysql/instance-access-control
@@ -15,6 +16,8 @@
 #   * https://cloud.google.com/sql/docs/mysql/connect-run#java_1
 # [service-account]
 #   * https://cloud.google.com/run/docs/configuring/service-accounts
+# [secret-manager]
+#   * https://cloud.google.com/cloud-build/docs/securing-builds/use-encrypted-secrets-credentials
 # [local]
 #   * https://cloud.google.com/sql/docs/mysql/quickstart-proxy-test
 # [tips]
@@ -38,7 +41,8 @@ steps:
       - "-c"
       - |
         set -ex
-        gcloud secrets versions access latest \
+        gcloud --project=${_SEC_PROJECT_ID} \
+          secrets versions access latest \
           --project=${_SEC_PROJECT_ID} \
           --secret=cr-sqldb-petclinic-app-secret \
           --format='get(payload.data)' | tr '_-' '/+' | base64 -d > decrypted-data.txt
@@ -49,11 +53,8 @@ steps:
       - "-c"
       - |
         set -ex
-        # gcloud secrets versions access latest \
-        #   --project=${_SEC_PROJECT_ID} \
-        #   --secret=cr-sqldb-petclinic-app-secret \
-        #   --format='get(payload.data)' | tr '_-' '/+' | base64 -d > decrypted-data.txt
-        gcloud run deploy ${REPO_NAME}-${BRANCH_NAME} \
+        gcloud --project ${_SEED_PROJECT_ID} \
+          run deploy ${REPO_NAME}-${BRANCH_NAME} \
           --image ${_ARTIFACT_REGISTRY}/${REPO_NAME}:dev-${SHORT_SHA} \
           --region ${_DEFAULT_REGION} \
           --platform managed \
@@ -83,9 +84,9 @@ steps:
 substitutions:
   _POLICY_REPO: '' # add path to policies here https://github.com/forseti-security/policy-library/blob/master/docs/user_guide.md#how-to-use-terraform-validator
 
-# Build options
+# https://cloud.google.com/cloud-build/docs/build-config?hl=en#options
 options:
-  machineType: 'N1_HIGHCPU_8'
+  machineType: 'E2_HIGHCPU_8'
 
-# Cloud Build Timeout
+# https://cloud.google.com/cloud-build/docs/build-config?hl=en#timeout_2
 timeout: 3600s
