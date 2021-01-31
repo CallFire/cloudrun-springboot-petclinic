@@ -72,10 +72,6 @@ steps:
 
 # project-service-account@prj-sre-d-sandbox-run-c366.iam.gserviceaccount.com
 # p195303305359-xdldiw@gcp-sa-cloud-sql.iam.gserviceaccount.com
-#
-# We already pushed the image in the first step as we need it to use it in the following deploy step
-# images:
-#   - "${_DEFAULT_REGION}-docker.pkg.dev/${PROJECT_ID}/container-repository/${REPO_NAME}:dev-${SHORT_SHA}"
 
 # Variables defined here will not override the ones supplied by our build
 # trigger. These variables are considered defaults if the value from our
