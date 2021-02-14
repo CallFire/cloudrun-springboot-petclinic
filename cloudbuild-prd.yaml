@@ -20,8 +20,7 @@ steps:
         set -ex
         gcloud --project=${_SEC_PROJECT_ID} \
           secrets versions access latest \
-          --project=${_SEC_PROJECT_ID} \
-          --secret=cr-sqldb-petclinic-app-secret \
+          --secret=sre-sb-cloudrun-project-sa-enc-key-secret \
           --format='get(payload.data)' | tr '_-' '/+' | base64 -d > decrypted-data.txt
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     entrypoint: /bin/sh
@@ -39,10 +38,12 @@ steps:
           --memory 512Mi \
           --vpc-connector ${_CONNECTOR_NAME} \
           --set-cloudsql-instances ${_CLOUD_MYSQL} \
+          --update-env-vars PROJECT_ID=${_PRD_PROJECT_ID} \
           --update-env-vars MYSQL_CONN=${_CLOUD_MYSQL} \
           --update-env-vars MYSQL_DB=petclinic \
           --update-env-vars MYSQL_USER=app \
-          --update-env-vars MYSQL_PASS=$(cat decrypted-data.txt)
+          --update-env-vars MYSQL_SA_KEY=$(cat decrypted-data.txt) \
+          # --update-env-vars MYSQL_PASS=$(cat decrypted-data.txt)
 
 substitutions:
   _POLICY_REPO: '' # add path to policies here https://github.com/forseti-security/policy-library/blob/master/docs/user_guide.md#how-to-use-terraform-validator
