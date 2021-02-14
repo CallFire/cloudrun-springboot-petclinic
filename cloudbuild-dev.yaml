@@ -43,9 +43,12 @@ steps:
         set -ex
         gcloud --project=${_SEC_PROJECT_ID} \
           secrets versions access latest \
-          --project=${_SEC_PROJECT_ID} \
-          --secret=cr-sqldb-petclinic-app-secret \
+          --secret=sre-sb-cloudrun-project-sa-enc-key-secret \
           --format='get(payload.data)' | tr '_-' '/+' | base64 -d > decrypted-data.txt
+        # gcloud --project=${_SEC_PROJECT_ID} \
+        #   secrets versions access latest \
+        #   --secret=sre-sb-cloudrun-sqldb-app-secret \
+        #   --format='get(payload.data)' | tr '_-' '/+' | base64 -d > decrypted-data.txt
   # [Start run deployment]
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     entrypoint: /bin/sh
@@ -65,8 +68,9 @@ steps:
           --set-cloudsql-instances ${_CLOUD_MYSQL} \
           --update-env-vars MYSQL_CONN=${_CLOUD_MYSQL} \
           --update-env-vars MYSQL_DB=petclinic \
-          --update-env-vars MYSQL_USER=app \
-          --update-env-vars MYSQL_PASS=$(cat decrypted-data.txt) \
+          --update-env-vars MYSQL_SA_KEY=$(cat decrypted-data.txt) \
+          # --update-env-vars MYSQL_USER=app \
+          # --update-env-vars MYSQL_PASS=$(cat decrypted-data.txt) \
           # --vpc-egress # all|private-ranges-only(default) \
           # --port 8080 \
 
