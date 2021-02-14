@@ -66,6 +66,7 @@ steps:
           --memory 512Mi \
           --vpc-connector ${_CONNECTOR_NAME} \
           --set-cloudsql-instances ${_CLOUD_MYSQL} \
+          --update-env-vars PROJECT_ID=${_PRD_PROJECT_ID} \
           --update-env-vars MYSQL_CONN=${_CLOUD_MYSQL} \
           --update-env-vars MYSQL_DB=petclinic \
           --update-env-vars MYSQL_SA_KEY=$(cat decrypted-data.txt) \
